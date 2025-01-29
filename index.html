@@ -7,35 +7,43 @@
     <title>TikTok Service</title>
     <style>
         /* General Reset */
-        body {
+        * {
             margin: 0;
-            padding: 20px;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
             font-family: 'Arial', sans-serif;
             background: radial-gradient(circle, #1e1e2e, #161625);
             color: #f1f1f1;
-            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            overflow: auto; /* Enables scrolling */
+            min-height: 100vh;
+            padding: 20px;
+            overflow-y: auto;
         }
 
-        /* Neon Glow Animation */
         @keyframes neonGlow {
-            0% { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff; }
-            50% { box-shadow: 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff, 0 0 50px #0ff; }
-            100% { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff; }
+            0% { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff; }
+            50% { box-shadow: 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff; }
+            100% { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff; }
         }
 
-        /* Form Container */
         .form-container {
             background: linear-gradient(145deg, #1a1a2c, #10101a);
             border-radius: 15px;
             box-shadow: 5px 5px 15px #000, -5px -5px 15px #2b2b3d;
             padding: 30px;
+            max-width: 90%;
             width: 400px;
-            max-height: 90vh; /* Limits height to fit within the screen */
-            overflow-y: auto; /* Allows scrolling within the form */
+            max-height: 90vh;
+            overflow-y: auto;
             animation: neonGlow 3s infinite alternate;
         }
 
@@ -46,7 +54,6 @@
             text-shadow: 0 0 10px #0ff;
         }
 
-        /* Form Fields */
         .form-group {
             margin-bottom: 20px;
         }
@@ -81,7 +88,6 @@
             box-shadow: 0 0 20px #0ff;
         }
 
-        /* Submit Button */
         button {
             background: #0ff;
             color: #10101a;
@@ -95,6 +101,19 @@
             box-shadow: 0 0 20px #00e6e6, 0 0 30px #00e6e6;
         }
 
+        .processing-message {
+            display: none;
+            text-align: center;
+            font-size: 16px;
+            margin-top: 20px;
+            color: #0ff;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
         /* Payment Details */
         .payment-info {
             text-align: center;
@@ -133,8 +152,8 @@
 </head>
 <body>
     <div class="form-container">
-        <h2>Tiktok Services</h2>
-        <form id="socialForm" method="POST" action="https://api.web3forms.com/submit">
+        <h2>TikTok Services</h2>
+        <form id="socialForm">
             <input type="hidden" name="access_key" value="33f28a60-fd13-4374-a98f-d3ac76eb5264">
 
             <div class="form-group">
@@ -164,7 +183,7 @@
 
             <!-- Payment Instruction Section -->
             <div class="payment-instruction">
-                <p>Please pay the total amount: <span id="displayTotal">Rs. 0</span> and</p>
+                <p>Please pay the total amount: <span id="totalAmount">Rs. 0</span> and</p>
                 <p>Fill in the transaction details below after making the payment.</p>
             </div>
 
@@ -172,7 +191,7 @@
                 <p><strong>Pay via eSewa:</strong> <span style="color:#0ff;">9804563632</span></p>
                 <img src="Qr.jpg" alt="eSewa QR Code">
                 <p><small>Scan the QR code to make a payment</small></p>
-            </div>
+            </div><br>
 
             <div class="form-group">
                 <label for="payerName">Your Name</label>
@@ -191,24 +210,55 @@
 
             <button type="submit">Submit</button>
         </form>
+
+        <p class="processing-message" id="processingMessage">Wait for some time, your work is in process...</p>
     </div>
 
     <script>
         const plan = document.getElementById('plan');
         const quantity = document.getElementById('quantity');
         const totalPrice = document.getElementById('totalPrice');
-        const displayTotal = document.getElementById('displayTotal');
+        const totalAmount = document.getElementById('totalAmount');
+        const socialForm = document.getElementById('socialForm');
+        const processingMessage = document.getElementById('processingMessage');
 
         function calculateTotal() {
             const planCost = parseFloat(plan.value) || 0;
             const quantityValue = parseInt(quantity.value) || 0;
             const total = planCost * quantityValue;
             totalPrice.value = `Rs. ${total}`;
-            displayTotal.innerText = `Rs. ${total}`;
+            totalAmount.textContent = `Rs. ${total}`;
         }
 
         plan.addEventListener('change', calculateTotal);
         quantity.addEventListener('input', calculateTotal);
+
+        socialForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            processingMessage.style.display = 'block';
+
+            const formData = new FormData(socialForm);
+
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    processingMessage.style.display = 'none';
+                    window.location.href = "thankyou.html";
+                } else {
+                    alert("Error: " + data.message);
+                    processingMessage.style.display = 'none';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error submitting your form. Please try again.');
+                processingMessage.style.display = 'none';
+            });
+        });
     </script>
 </body>
 </html>
