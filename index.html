@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <title>TikTok Service</title>
     <style>
         /* General Reset */
@@ -21,8 +22,9 @@
             font-family: 'Arial', sans-serif;
             background: radial-gradient(circle, #1e1e2e, #161625);
             color: #f1f1f1;
-            display: flex;
-            justify-content: center;
+            display: block;
+            align-content: center;
+            justify-items: center;
             align-items: center;
             min-height: 100vh;
             padding: 20px;
@@ -42,11 +44,18 @@
             padding: 30px;
             max-width: 90%;
             width: 400px;
-            max-height: 90vh;
+            max-height: 100%;
             overflow-y: auto;
             animation: neonGlow 3s infinite alternate;
         }
-
+        h3{
+          text-align: center;
+            color: #FAFDFE;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #0ff;
+        }
+          
+        
         h2 {
             text-align: center;
             color: #0ff;
@@ -148,9 +157,42 @@
             color: #0ff;
             font-weight: bold;
         }
+     
+.footer{
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            padding: 30px;
+            max-width: 90%;
+            width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
+}
+   .social-icons {
+            display: flex;
+            justify-content: center;
+          
+            
+        }
+        .social-icons a {
+            color:  #10fde5;
+            transition: color 0.3s;
+           padding: 5px;
+        }
+
+        .social-icons a:hover {
+            color: #FD104A;
+        }
+     
     </style>
 </head>
 <body>
+  <h1>TikTok</h1><br>
+  <p>Grow your TikTok account at very cheap price. This platform helps to boost your Id to the users all over the world.</p><br><br><br>
+  
+  
+  <h3> Follow The Steps:</h3>
+  
     <div class="form-container">
         <h2>TikTok Services</h2>
         <form id="socialForm">
@@ -206,14 +248,36 @@
             <div class="form-group">
                 <label for="remark">Remark</label>
                 <input type="text" id="remark" name="remark" placeholder="Enter the remark used in payment" required>
+                
             </div>
 
             <button type="submit">Submit</button>
-        </form>
+          
+        </form><br>
+           <p class="processing-message" id="processingMessage">Wait for some time, your work is in process...</p>
+    </div><br><br>
+<div class="footer">    
+        <h1>Contact Us:</h1>
+        
+         <p>Have a problem? Feel free to reach out.</p><br><br>
+         
 
-        <p class="processing-message" id="processingMessage">Wait for some time, your work is in process...</p>
-    </div>
-
+     
+        <div class="social-icons">
+                    <a href="https://www.instagram.com/rajpatwa18110" target="_blank" title="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.facebook.com/rajpatwa18110" target="_blank" title="Facebook">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="https://m.me/yrajpatwa18110" target="_blank" title="Messenger">
+                        <i class="fab fa-facebook-messenger"></i>
+                    </a>
+                    <a href="https://wa.me/9805673632" target="_blank" title="WhatsApp">
+                        <i class="fab fa-whatsapp"></i>
+                    </a>
+                </div>
+</div>
     <script>
         const plan = document.getElementById('plan');
         const quantity = document.getElementById('quantity');
@@ -260,5 +324,6 @@
             });
         });
     </script>
+    
 </body>
 </html>
