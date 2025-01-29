@@ -21,15 +21,9 @@
 
         /* Neon Glow Animation */
         @keyframes neonGlow {
-            0% {
-                box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff;
-            }
-            50% {
-                box-shadow: 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff, 0 0 50px #0ff;
-            }
-            100% {
-                box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff;
-            }
+            0% { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff; }
+            50% { box-shadow: 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff, 0 0 50px #0ff; }
+            100% { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff; }
         }
 
         /* Form Container */
@@ -98,34 +92,55 @@
             box-shadow: 0 0 20px #00e6e6, 0 0 30px #00e6e6;
         }
 
-        /* Payment Details Section */
-        .form-group p {
-            color: #f1f1f1;
-            font-size: 14px;
+        /* Payment Details */
+        .payment-info {
+            text-align: center;
+            margin-top: 20px;
         }
 
-        /* Receipt Upload Field */
-        input[type="file"] {
-            padding: 5px;
+        .payment-info p {
+            font-size: 16px;
+            color: #f1f1f1;
+        }
+
+        .payment-info img {
+            width: 150px;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #0ff;
+        }
+
+        /* Payment Instruction Section */
+        .payment-instruction {
+            text-align: center;
+            background: rgba(0, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 0 10px #0ff;
+        }
+
+        .payment-instruction p {
+            font-size: 16px;
+            color: #0ff;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="form-container">
-        <h2>Social Media Service</h2>
+        <h2>Tiktok Services</h2>
         <form id="socialForm" method="POST" action="https://api.web3forms.com/submit">
-            <!-- Web3Forms Access Key -->
             <input type="hidden" name="access_key" value="33f28a60-fd13-4374-a98f-d3ac76eb5264">
-
-            
 
             <div class="form-group">
                 <label for="plan">Select Plan</label>
                 <select id="plan" name="plan" required>
                     <option value="" disabled selected>Choose a plan</option>
-                    <option value="10">Basic Plan - $10</option>
-                    <option value="25">Standard Plan - $25</option>
-                    <option value="50">Premium Plan - $50</option>
+                    <option value="0.005">TikTok Views - Rs.10 per 2000</option>
+                    <option value="0.1">TikTok Likes - Rs.100 per 1000</option>
+                    <option value="0.50">TikTok Followers - Rs.500 per 1000</option>
                 </select>
             </div>
 
@@ -144,19 +159,31 @@
                 <input type="text" id="totalPrice" name="totalPrice" readonly>
             </div>
 
-            <div class="form-group">
-                <label for="paymentConfirmation">Payment Confirmation</label>
-                <p>Please pay the calculated amount of <span id="amountToPay">$0.00</span> to our account and provide details below:</p>
+            <!-- Payment Instruction Section -->
+            <div class="payment-instruction">
+                <p>Please pay the total amount: <span id="displayTotal">Rs. 0</span></p>
+                <p>Fill in the transaction details below after making the payment.</p>
+            </div>
+
+            <div class="payment-info">
+                <p><strong>Pay via eSewa:</strong> <span style="color:#0ff;">9804563632</span></p>
+                <img src="your-qr-code-image.png" alt="eSewa QR Code">
+                <p><small>Scan the QR code to make a payment</small></p>
             </div>
 
             <div class="form-group">
-                <label for="remark">Name in Remark</label>
-                <input type="text" id="remark" name="remark" placeholder="Enter the name used in the payment remark" required>
+                <label for="payerName">Your Name</label>
+                <input type="text" id="payerName" name="payerName" placeholder="Enter your full name" required>
             </div>
 
             <div class="form-group">
-                <label for="receipt">Upload Payment Receipt</label>
-                <input type="file" id="receipt" name="receipt" accept="image/*" required>
+                <label for="transactionCode">Transaction Code</label>
+                <input type="text" id="transactionCode" name="transactionCode" placeholder="Enter transaction code" required>
+            </div>
+
+            <div class="form-group">
+                <label for="remark">Remark</label>
+                <input type="text" id="remark" name="remark" placeholder="Enter the remark used in payment" required>
             </div>
 
             <button type="submit">Submit</button>
@@ -167,34 +194,18 @@
         const plan = document.getElementById('plan');
         const quantity = document.getElementById('quantity');
         const totalPrice = document.getElementById('totalPrice');
-        const amountToPay = document.getElementById('amountToPay');
+        const displayTotal = document.getElementById('displayTotal');
 
         function calculateTotal() {
             const planCost = parseFloat(plan.value) || 0;
             const quantityValue = parseInt(quantity.value) || 0;
             const total = planCost * quantityValue;
-            totalPrice.value = `$${total.toFixed(2)}`;
-            amountToPay.textContent = `$${total.toFixed(2)}`;
+            totalPrice.value = `Rs. ${total}`;
+            displayTotal.innerText = `Rs. ${total}`;
         }
 
         plan.addEventListener('change', calculateTotal);
         quantity.addEventListener('input', calculateTotal);
-
-        // Form submission handling for Web3Forms
-        const form = document.getElementById('socialForm');
-        form.addEventListener('submit', (e) => {
-            e.preventDefault(); // Prevent default submission
-            fetch(form.action, {
-                method: 'POST',
-                body: new FormData(form),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    alert(data.message || 'Form submitted successfully!');
-                    form.reset(); // Clear the form
-                })
-                .catch((error) => alert('Failed to submit form: ' + error));
-        });
     </script>
 </body>
 </html>
