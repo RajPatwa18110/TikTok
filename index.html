@@ -5,325 +5,417 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-    <title>TikTok Service</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <title>TikTok Booster</title>
     <style>
-        /* General Reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
-
         body {
-            font-family: 'Arial', sans-serif;
-            background: radial-gradient(circle, #1e1e2e, #161625);
-            color: #f1f1f1;
-            display: block;
-            align-content: center;
-            justify-items: center;
-            align-items: center;
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #1a0033, #330066);
+            color: #e0e0ff;
             min-height: 100vh;
             padding: 20px;
             overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
         }
 
-        @keyframes neonGlow {
-            0% { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff; }
-            50% { box-shadow: 0 0 20px #0ff, 0 0 30px #0ff, 0 0 40px #0ff; }
-            100% { box-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 30px #0ff; }
-        }
-
-        .form-container {
-            background: linear-gradient(145deg, #1a1a2c, #10101a);
-            border-radius: 15px;
-            box-shadow: 5px 5px 15px #000, -5px -5px 15px #2b2b3d;
-            padding: 30px;
-            max-width: 90%;
-            width: 400px;
-            max-height: 100%;
-            overflow-y: auto;
-            animation: neonGlow 3s infinite alternate;
-        }
-        h3{
-          text-align: center;
-            color: #FAFDFE;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px #0ff;
-        }
-          
-        
-        h2 {
-            text-align: center;
-            color: #0ff;
-            margin-bottom: 20px;
-            text-shadow: 0 0 10px #0ff;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: #0ff;
-            text-shadow: 0 0 5px #0ff;
-        }
-
-        input, select, button {
+        /* Thunder Lightning Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 10px;
-            font-size: 14px;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            animation: lightning 8s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes lightning {
+            0%, 90% { opacity: 0; }
+            92% { opacity: 0.6; }
+            94% { opacity: 0.2; }
+            96% { opacity: 0.8; }
+            98% { opacity: 0.3; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 10px #8a00ff, 0 0 20px #8a00ff; }
+            50% { box-shadow: 0 0 20px #8a00ff, 0 0 30px #8a00ff; }
+            100% { box-shadow: 0 0 10px #8a00ff, 0 0 20px #8a00ff; }
+        }
+
+        .welcome-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #8a00ff;
+            color: #fff;
+            padding: 20px 40px;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 15px;
+            box-shadow: 0 0 30px #8a00ff;
+            animation: popIn 0.5s ease-out;
+            z-index: 1000;
+        }
+
+        .container {
+            background: linear-gradient(145deg, #2a004d, #1a0033);
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(138, 0, 255, 0.5);
+            padding: 30px;
+            max-width: 550px;
+            width: 100%;
+            text-align: center;
+            animation: glowPulse 3s infinite alternate;
+            display: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        h2 {
+            color: #cc99ff;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px #cc99ff;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .step {
+            display: none;
+            animation: popIn 0.4s ease-out;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .step p {
+            font-weight: bold;
+            font-size: 18px;
+            color: #cc99ff;
+            text-shadow: 0 0 5px #8a00ff;
+            margin-bottom: 15px;
+        }
+
+        .option {
+            background: #3d007a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(138, 0, 255, 0.3);
+        }
+
+        .option:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 0 20px #8a00ff;
+            background: #4d0099;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
             border: none;
-            border-radius: 10px;
-            outline: none;
-            background: #181825;
-            color: #f1f1f1;
-            box-shadow: inset 2px 2px 5px #000, inset -2px -2px 5px #2b2b3d;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 12px;
+            background: #3d007a;
+            color: #e0e0ff;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5), inset -2px -2px 5px rgba(138, 0, 255, 0.2);
+            margin: 10px 0;
+            transition: all 0.3s ease;
         }
 
-        input:hover, select:hover, button:hover {
-            box-shadow: 0 0 15px #0ff;
-            transform: scale(1.05);
-        }
-
-        input:focus, select:focus {
-            box-shadow: 0 0 20px #0ff;
+        input:hover, button:hover {
+            box-shadow: 0 0 15px #8a00ff;
+            transform: scale(1.03);
         }
 
         button {
-            background: #0ff;
-            color: #10101a;
-            cursor: pointer;
+            background: #8a00ff;
+            color: #fff;
             font-weight: bold;
-            transition: background 0.3s ease, transform 0.3s ease;
+            cursor: pointer;
         }
 
         button:hover {
-            background: #00e6e6;
-            box-shadow: 0 0 20px #00e6e6, 0 0 30px #00e6e6;
+            background: #a600ff;
+            box-shadow: 0 0 20px #a600ff;
         }
 
-        .processing-message {
-            display: none;
-            text-align: center;
-            font-size: 16px;
-            margin-top: 20px;
-            color: #0ff;
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        /* Payment Details */
-        .payment-info {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .payment-info p {
-            font-size: 16px;
-            color: #f1f1f1;
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
         }
 
         .payment-info img {
             width: 150px;
-            height: auto;
-            margin-top: 10px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px #0ff;
+            margin: 10px 0;
+            border-radius: 12px;
+            box-shadow: 0 0 15px #8a00ff;
         }
 
-        /* Payment Instruction Section */
-        .payment-instruction {
-            text-align: center;
-            background: rgba(0, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin-top: 20px;
-            box-shadow: 0 0 10px #0ff;
-        }
-
-        .payment-instruction p {
-            font-size: 16px;
-            color: #0ff;
+        .total-amount {
+            color: #cc99ff;
             font-weight: bold;
-        }
-     
-.footer{
-            display: flex;
-            justify-content: center;
-            flex-direction: column;
-            padding: 30px;
-            max-width: 90%;
-            width: 400px;
-            max-height: 90vh;
-            overflow-y: auto;
-}
-   .social-icons {
-            display: flex;
-            justify-content: center;
-          
-            
-        }
-        .social-icons a {
-            color:  #10fde5;
-            transition: color 0.3s;
-           padding: 5px;
+            margin: 10px 0;
         }
 
-        .social-icons a:hover {
-            color: #FD104A;
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
         }
-     
+
+        .back-btn {
+            background: #ff3366;
+            color: #fff;
+        }
+
+        .back-btn:hover {
+            background: #ff1a4d;
+            box-shadow: 0 0 20px #ff1a4d;
+        }
     </style>
 </head>
 <body>
-  <h1>TikTok</h1><br>
-  <p>Want to skyrocket your TikTok account without breaking the bank? Our platform boosts your profile, reaching audiences worldwide at the cheapest rates! Get real engagement and grow like never before!</p><br><br><br>
-  
-  
-  <h3> Follow The Steps:</h3>
-  
-    <div class="form-container">
-        <h2>TikTok Services</h2>
-        <form id="socialForm">
-            <input type="hidden" name="access_key" value="33f28a60-fd13-4374-a98f-d3ac76eb5264">
+    <div class="welcome-popup" id="welcomePopup">TikTok Booster</div>
+    <div class="container" id="mainContainer">
+        <h2>Boost Your TikTok!</h2>
 
-            <div class="form-group">
-                <label for="plan">Select Plan</label>
-                <select id="plan" name="plan" required>
-                    <option value="" disabled selected>Choose a plan</option>
-                    <option value="0.005">TikTok Views - Rs.10 per 2000</option>
-                    <option value="0.1">TikTok Likes - Rs.100 per 1000</option>
-                    <option value="0.50">TikTok Followers - Rs.500 per 1000</option>
-                </select>
+        <!-- Step 1: What to Boost -->
+        <div class="step" id="step1">
+            <p>What do you want to boost?</p>
+            <div class="option" onclick="selectOption('followers', 0.50)">Followers - Rs.500 per 1000</div>
+            <div class="option" onclick="selectOption('likes', 0.1)">Likes - Rs.100 per 1000</div>
+            <div class="option" onclick="selectOption('views', 0.005)">Views - Rs.10 per 2000</div>
+        </div>
+
+        <!-- Step 2: Enter Link -->
+        <div class="step" id="step2">
+            <p id="linkQuestion">Enter your TikTok link</p>
+            <input type="url" id="linkInput" placeholder="Enter your link" required>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack(1)">Go Back</button>
+                <button onclick="nextStep(3)">Boost Now</button>
             </div>
+        </div>
 
-            <div class="form-group">
-                <label for="link">Enter Link</label>
-                <input type="url" id="link" name="link" placeholder="Enter your link" required>
+        <!-- Step 3: Enter Quantity -->
+        <div class="step" id="step3">
+            <p>Enter Quantity</p>
+            <input type="number" id="quantityInput" min="1" placeholder="Enter quantity" required>
+            <p>Total Amount: <span id="totalAmount">Rs. 0</span></p>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack(2)">Go Back</button>
+                <button onclick="nextStep(4)">Pay to Boost</button>
             </div>
+        </div>
 
-            <div class="form-group">
-                <label for="quantity">Enter Quantity</label>
-                <input type="number" id="quantity" name="quantity" min="1" placeholder="Enter quantity" required>
-            </div>
-
-            <div class="form-group">
-                <label for="totalPrice">Total Price</label>
-                <input type="text" id="totalPrice" name="totalPrice" readonly>
-            </div>
-
-            <!-- Payment Instruction Section -->
-            <div class="payment-instruction">
-                <p>Please pay the total amount: <span id="totalAmount">Rs. 0</span> and</p>
-                <p>Fill in the transaction details below after making the payment.</p>
-            </div>
-
+        <!-- Step 4: Payment Details -->
+        <div class="step" id="step4">
+            <p>Pay <span id="paymentAmount">Rs. 0</span> to boost</p>
             <div class="payment-info">
-                <p><strong>Pay via eSewa:</strong> <span style="color:#0ff;">9804563632</span></p>
+                <p><strong>Pay via eSewa:</strong> 9804563632</p>
                 <img src="Qr.jpg" alt="eSewa QR Code">
                 <p><small>Scan the QR code to make a payment</small></p>
-            </div><br>
-
-            <div class="form-group">
-                <label for="payerName">Your Name</label>
-                <input type="text" id="payerName" name="payerName" placeholder="Enter your full name" required>
             </div>
-
-            <div class="form-group">
-                <label for="transactionCode">Transaction Code</label>
-                <input type="text" id="transactionCode" name="transactionCode" placeholder="Enter transaction code" required>
+            <input type="text" id="transactionCode" placeholder="Enter transaction code" required>
+            <input type="number" id="paidAmount" placeholder="Enter paid amount" required>
+            <input type="text" id="remark" placeholder="Enter remark" required>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack(3)">Go Back</button>
+                <button id="submitBtn" onclick="submitForm()">Boost Now</button>
             </div>
+        </div>
+    </div>
 
-            <div class="form-group">
-                <label for="remark">Remark</label>
-                <input type="text" id="remark" name="remark" placeholder="Enter the remark used in payment" required>
-                
-            </div>
-
-            <button type="submit">Submit</button>
-          
-        </form><br>
-           <p class="processing-message" id="processingMessage">Wait for some time, your work is in process...</p>
-    </div><br><br>
-<div class="footer">    
-        <h1>Contact Us:</h1>
-        
-         <p>Have a problem? Feel free to reach out.</p><br><br>
-         
-
-     
-        <div class="social-icons">
-                    <a href="https://www.instagram.com/rajpatwa18110" target="_blank" title="Instagram">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="https://www.facebook.com/rajpatwa18110" target="_blank" title="Facebook">
-                        <i class="fab fa-facebook"></i>
-                    </a>
-                    <a href="https://m.me/yrajpatwa18110" target="_blank" title="Messenger">
-                        <i class="fab fa-facebook-messenger"></i>
-                    </a>
-                    <a href="https://wa.me/+977 9805673632" target="_blank" title="WhatsApp">
-                        <i class="fab fa-whatsapp"></i>
-                    </a>
-                </div>
-</div>
     <script>
-        const plan = document.getElementById('plan');
-        const quantity = document.getElementById('quantity');
-        const totalPrice = document.getElementById('totalPrice');
-        const totalAmount = document.getElementById('totalAmount');
-        const socialForm = document.getElementById('socialForm');
-        const processingMessage = document.getElementById('processingMessage');
+        let selectedService = '';
+        let costPerUnit = 0;
+        let link = '';
+        let quantity = 0;
+        let total = 0;
+        let isSubmitting = false;
 
-        function calculateTotal() {
-            const planCost = parseFloat(plan.value) || 0;
-            const quantityValue = parseInt(quantity.value) || 0;
-            const total = planCost * quantityValue;
-            totalPrice.value = `Rs. ${total}`;
-            totalAmount.textContent = `Rs. ${total}`;
+        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxPsF6ghhjBA1cNs5snKZ3DuCTN3jcJmiDOBIVuRcu8L4RH7cuZK9a4KWOMMeFmwbG6/exec';
+
+        // Show welcome popup and start at Step 1
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('welcomePopup').style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                    document.getElementById('welcomePopup').style.display = 'none';
+                    document.getElementById('mainContainer').style.display = 'block';
+                    document.getElementById('step1').classList.add('active');
+                }, 300);
+            }, 750);
+        };
+
+        // Select boost option
+        function selectOption(service, cost) {
+            selectedService = service;
+            costPerUnit = cost;
+            transitionStep('step1', 'step2');
+            document.getElementById('linkQuestion').textContent = 
+                service === 'followers' ? 'Enter your TikTok account link' : 'Enter your TikTok video link';
         }
 
-        plan.addEventListener('change', calculateTotal);
-        quantity.addEventListener('input', calculateTotal);
-
-        socialForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            processingMessage.style.display = 'block';
-
-            const formData = new FormData(socialForm);
-
-            fetch('https://api.web3forms.com/submit', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    processingMessage.style.display = 'none';
-                    window.location.href = "thankyou.html";
-                } else {
-                    alert("Error: " + data.message);
-                    processingMessage.style.display = 'none';
+        // Move to next step
+        function nextStep(step) {
+            if (step === 3) {
+                link = document.getElementById('linkInput').value;
+                if (!link) {
+                    alert('Please enter a valid link!');
+                    return;
                 }
+                transitionStep('step2', 'step3');
+            } else if (step === 4) {
+                quantity = parseInt(document.getElementById('quantityInput').value) || 0;
+                if (quantity <= 0) {
+                    alert('Please enter a valid quantity!');
+                    return;
+                }
+                total = costPerUnit * quantity;
+                document.getElementById('totalAmount').textContent = `Rs. ${total}`;
+                document.getElementById('paymentAmount').textContent = `Rs. ${total}`;
+                transitionStep('step3', 'step4');
+            }
+        }
+
+        // Go back to previous step
+        function goBack(previousStep) {
+            if (previousStep === 1) {
+                transitionStep('step2', 'step1');
+            } else if (previousStep === 2) {
+                transitionStep('step3', 'step2');
+            } else if (previousStep === 3) {
+                transitionStep('step4', 'step3');
+            }
+        }
+
+        // Smooth transition between steps
+        function transitionStep(currentStepId, nextStepId) {
+            const currentStep = document.getElementById(currentStepId);
+            currentStep.style.animation = 'fadeOut 0.3s ease-out forwards';
+            setTimeout(() => {
+                currentStep.classList.remove('active');
+                const nextStep = document.getElementById(nextStepId);
+                nextStep.classList.add('active');
+                nextStep.style.animation = 'popIn 0.4s ease-out';
+            }, 300);
+        }
+
+        // Calculate total on quantity input
+        document.getElementById('quantityInput').addEventListener('input', () => {
+            quantity = parseInt(document.getElementById('quantityInput').value) || 0;
+            total = costPerUnit * quantity;
+            document.getElementById('totalAmount').textContent = `Rs. ${total}`;
+        });
+
+        // Submit form to Google Sheets and reset
+        function submitForm() {
+            if (isSubmitting) return;
+
+            const submitBtn = document.getElementById('submitBtn');
+            const transactionCode = document.getElementById('transactionCode').value;
+            const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
+            const remark = document.getElementById('remark').value;
+
+            if (!transactionCode || paidAmount !== total || !remark) {
+                alert('Please ensure all fields are filled correctly and paid amount matches the total!');
+                return;
+            }
+
+            isSubmitting = true;
+            submitBtn.disabled = true;
+
+            const timestamp = new Date().toLocaleString();
+            const formData = {
+                timestamp: timestamp,
+                service: selectedService,
+                link: link,
+                quantity: quantity,
+                total_amount: total,
+                transaction_code: transactionCode,
+                remark: remark
+            };
+
+            fetch(GOOGLE_SHEET_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(formData),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(() => {
+                const csvContent = `Timestamp,Service,Link,Quantity,Total Amount,Transaction Code,Remark\n${timestamp},${selectedService},${link},${quantity},${total},${transactionCode},${remark}`;
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `tiktok_boost_${Date.now()}.csv`;
+                a.click();
+                window.URL.revokeObjectURL(url);
+
+                alert('Boost submitted successfully! Data stored in Google Sheet.');
+
+                resetForm();
+                isSubmitting = false;
+                submitBtn.disabled = false;
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('There was an error submitting your form. Please try again.');
-                processingMessage.style.display = 'none';
+                console.error('Submission Error:', error);
+                alert('Error submitting to Google Sheet: ' + error.message + '. Check the console for details.');
+                isSubmitting = false;
+                submitBtn.disabled = false;
             });
-        });
+        }
+
+        // Reset form and restart at Step 1
+        function resetForm() {
+            selectedService = '';
+            costPerUnit = 0;
+            link = '';
+            quantity = 0;
+            total = 0;
+
+            document.getElementById('linkInput').value = '';
+            document.getElementById('quantityInput').value = '';
+            document.getElementById('totalAmount').textContent = 'Rs. 0';
+            document.getElementById('paymentAmount').textContent = 'Rs. 0';
+            document.getElementById('transactionCode').value = '';
+            document.getElementById('paidAmount').value = '';
+            document.getElementById('remark').value = '';
+
+            transitionStep('step4', 'step1');
+        }
     </script>
-    
 </body>
 </html>
