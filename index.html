@@ -16,15 +16,55 @@
 
         body {
             font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(135deg, #1a0033, #330066);
+            background: linear-gradient(135deg, rgba(26, 0, 51, 0.8), rgba(51, 0, 102, 0.8)), url('bg.jpg') no-repeat center center fixed;
+            background-size: cover;
             color: #e0e0ff;
             min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            background: rgba(26, 0, 51, 0.9);
             padding: 20px;
-            overflow-y: auto;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(138, 0, 255, 0.5);
+        }
+
+        nav {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #cc99ff;
+            text-shadow: 0 0 10px #cc99ff;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links li a {
+            color: #e0e0ff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links li a:hover {
+            color: #8a00ff;
         }
 
         /* Thunder Lightning Effect */
@@ -93,6 +133,7 @@
             text-align: center;
             animation: glowPulse 3s infinite alternate;
             display: none;
+            margin: 100px auto 50px;
             position: relative;
             z-index: 1;
         }
@@ -203,9 +244,49 @@
             background: #ff1a4d;
             box-shadow: 0 0 20px #ff1a4d;
         }
+
+        /* Footer */
+        footer {
+            background: rgba(26, 0, 51, 0.9);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            box-shadow: 0 -2px 10px rgba(138, 0, 255, 0.5);
+        }
+
+        footer p {
+            margin: 10px 0;
+            font-size: 14px;
+        }
+
+        .social-links a {
+            color: #e0e0ff;
+            margin: 0 10px;
+            font-size: 20px;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover {
+            color: #8a00ff;
+        }
     </style>
 </head>
 <body>
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="logo">TikTok Booster</div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
     <div class="welcome-popup" id="welcomePopup">TikTok Booster</div>
     <div class="container" id="mainContainer">
         <h2>Boost Your TikTok!</h2>
@@ -256,6 +337,17 @@
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 TikTok Booster. All Rights Reserved.</p>
+        <p>Contact us: <a href="mailto:support@tiktokbooster.com">support@tiktokbooster.com</a></p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-tiktok"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+    </footer>
 
     <script>
         let selectedService = '';
