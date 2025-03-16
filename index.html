@@ -16,55 +16,15 @@
 
         body {
             font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(135deg, rgba(26, 0, 51, 0.8), rgba(51, 0, 102, 0.8)), url('bg.jpg') no-repeat center center fixed;
-            background-size: cover;
+            background: linear-gradient(135deg, #1a0033, #330066);
             color: #e0e0ff;
             min-height: 100vh;
-            padding: 0;
-            overflow-x: hidden;
-        }
-
-        /* Header */
-        header {
-            background: rgba(26, 0, 51, 0.9);
             padding: 20px;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 10px rgba(138, 0, 255, 0.5);
-        }
-
-        nav {
+            overflow-y: auto;
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #cc99ff;
-            text-shadow: 0 0 10px #cc99ff;
-        }
-
-        .nav-links {
-            list-style: none;
-            display: flex;
-            gap: 20px;
-        }
-
-        .nav-links li a {
-            color: #e0e0ff;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links li a:hover {
-            color: #8a00ff;
+            position: relative;
         }
 
         /* Thunder Lightning Effect */
@@ -133,7 +93,6 @@
             text-align: center;
             animation: glowPulse 3s infinite alternate;
             display: none;
-            margin: 100px auto 50px;
             position: relative;
             z-index: 1;
         }
@@ -244,49 +203,9 @@
             background: #ff1a4d;
             box-shadow: 0 0 20px #ff1a4d;
         }
-
-        /* Footer */
-        footer {
-            background: rgba(26, 0, 51, 0.9);
-            padding: 20px;
-            text-align: center;
-            position: relative;
-            bottom: 0;
-            width: 100%;
-            box-shadow: 0 -2px 10px rgba(138, 0, 255, 0.5);
-        }
-
-        footer p {
-            margin: 10px 0;
-            font-size: 14px;
-        }
-
-        .social-links a {
-            color: #e0e0ff;
-            margin: 0 10px;
-            font-size: 20px;
-            transition: color 0.3s ease;
-        }
-
-        .social-links a:hover {
-            color: #8a00ff;
-        }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header>
-        <nav>
-            <div class="logo">TikTok Booster</div>
-            <ul class="nav-links">
-                <li><a href="#home">Home</a></li>
-                <li><a href="#services">Services</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <!-- Main Content -->
     <div class="welcome-popup" id="welcomePopup">TikTok Booster</div>
     <div class="container" id="mainContainer">
         <h2>Boost Your TikTok!</h2>
@@ -313,7 +232,7 @@
         <div class="step" id="step3">
             <p>Enter Quantity</p>
             <input type="number" id="quantityInput" min="1" placeholder="Enter quantity" required>
-            <p>Total Amount: <span id="totalAmount">Rs. 0</span></p>
+            <p>Total Amount: <span id="totalAmount">Rs. 0.00</span></p>
             <div class="button-group">
                 <button class="back-btn" onclick="goBack(2)">Go Back</button>
                 <button onclick="nextStep(4)">Pay to Boost</button>
@@ -322,14 +241,14 @@
 
         <!-- Step 4: Payment Details -->
         <div class="step" id="step4">
-            <p>Pay <span id="paymentAmount">Rs. 0</span> to boost</p>
+            <p>Pay <span id="paymentAmount">Rs. 0.00</span> to boost</p>
             <div class="payment-info">
                 <p><strong>Pay via eSewa:</strong> 9804563632</p>
                 <img src="Qr.jpg" alt="eSewa QR Code">
                 <p><small>Scan the QR code to make a payment</small></p>
             </div>
             <input type="text" id="transactionCode" placeholder="Enter transaction code" required>
-            <input type="number" id="paidAmount" placeholder="Enter paid amount" required>
+            <input type="number" id="paidAmount" placeholder="Enter paid amount" step="0.01" required>
             <input type="text" id="remark" placeholder="Enter remark" required>
             <div class="button-group">
                 <button class="back-btn" onclick="goBack(3)">Go Back</button>
@@ -338,16 +257,296 @@
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer>
-        <p>&copy; 2025 TikTok Booster. All Rights Reserved.</p>
-        <p>Contact us: <a href="mailto:support@tiktokbooster.com">support@tiktokbooster.com</a></p>
-        <div class="social-links">
-            <a href="#"><i class="fab fa-tiktok"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
+    <script>
+        let selectedService = '';
+        let costPerUnit = 0;
+        let link = '';
+        let quantity = 0;
+        let total = 0;
+        let isSubmitting = false;
+
+        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxPsF6ghhjBA1cNs5snKZ3DuCTN3jcJmiDOBIVuRcu8L4RH7cuZK9a4KWOMMeFmwbG6/exec';
+
+        // Show welcome popup and start at Step 1
+        window.onload = () => {
+            setTimeout(() => {
+                document.getElementById('welcomePopup').style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                    document.getElementById('welcomePopup').style.display = 'none';
+                    document.getElementById('mainContainer').style.display = 'block';
+                    document.getElementById('step1').classList.add('active');
+                }, 300);
+            }, 750);
+        };
+
+        // Select boost option
+        function selectOption(service, cost) {
+            selectedService = service;
+            costPerUnit = cost;
+            transitionStep('step1', 'step2');
+            document.getElementById('linkQuestion').textContent = 
+                service === 'followers' ? 'Enter your TikTok account link' : 'Enter your TikTok video link';
+        }
+
+        // Move to next step
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <title>TikTok Booster</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #1a0033, #330066);
+            color: #e0e0ff;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Thunder Lightning Effect */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            animation: lightning 8s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes lightning {
+            0%, 90% { opacity: 0; }
+            92% { opacity: 0.6; }
+            94% { opacity: 0.2; }
+            96% { opacity: 0.8; }
+            98% { opacity: 0.3; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 10px #8a00ff, 0 0 20px #8a00ff; }
+            50% { box-shadow: 0 0 20px #8a00ff, 0 0 30px #8a00ff; }
+            100% { box-shadow: 0 0 10px #8a00ff, 0 0 20px #8a00ff; }
+        }
+
+        .welcome-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #8a00ff;
+            color: #fff;
+            padding: 20px 40px;
+            font-size: 28px;
+            font-weight: bold;
+            border-radius: 15px;
+            box-shadow: 0 0 30px #8a00ff;
+            animation: popIn 0.5s ease-out;
+            z-index: 1000;
+        }
+
+        .container {
+            background: linear-gradient(145deg, #2a004d, #1a0033);
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(138, 0, 255, 0.5);
+            padding: 30px;
+            max-width: 550px;
+            width: 100%;
+            text-align: center;
+            animation: glowPulse 3s infinite alternate;
+            display: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        h2 {
+            color: #cc99ff;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px #cc99ff;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .step {
+            display: none;
+            animation: popIn 0.4s ease-out;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .step p {
+            font-weight: bold;
+            font-size: 18px;
+            color: #cc99ff;
+            text-shadow: 0 0 5px #8a00ff;
+            margin-bottom: 15px;
+        }
+
+        .option {
+            background: #3d007a;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(138, 0, 255, 0.3);
+        }
+
+        .option:hover {
+            transform: scale(1.05) translateY(-5px);
+            box-shadow: 0 0 20px #8a00ff;
+            background: #4d0099;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 12px;
+            background: #3d007a;
+            color: #e0e0ff;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5), inset -2px -2px 5px rgba(138, 0, 255, 0.2);
+            margin: 10px 0;
+            transition: all 0.3s ease;
+        }
+
+        input:hover, button:hover {
+            box-shadow: 0 0 15px #8a00ff;
+            transform: scale(1.03);
+        }
+
+        button {
+            background: #8a00ff;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #a600ff;
+            box-shadow: 0 0 20px #a600ff;
+        }
+
+        button:disabled {
+            background: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .payment-info img {
+            width: 150px;
+            margin: 10px 0;
+            border-radius: 12px;
+            box-shadow: 0 0 15px #8a00ff;
+        }
+
+        .total-amount {
+            color: #cc99ff;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .back-btn {
+            background: #ff3366;
+            color: #fff;
+        }
+
+        .back-btn:hover {
+            background: #ff1a4d;
+            box-shadow: 0 0 20px #ff1a4d;
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-popup" id="welcomePopup">TikTok Booster</div>
+    <div class="container" id="mainContainer">
+        <h2>Boost Your TikTok!</h2>
+
+        <!-- Step 1: What to Boost -->
+        <div class="step" id="step1">
+            <p>What do you want to boost?</p>
+            <div class="option" onclick="selectOption('followers', 0.50)">Followers - Rs.500 per 1000</div>
+            <div class="option" onclick="selectOption('likes', 0.1)">Likes - Rs.100 per 1000</div>
+            <div class="option" onclick="selectOption('views', 0.005)">Views - Rs.10 per 2000</div>
         </div>
-    </footer>
+
+        <!-- Step 2: Enter Link -->
+        <div class="step" id="step2">
+            <p id="linkQuestion">Enter your TikTok link</p>
+            <input type="url" id="linkInput" placeholder="Enter your link" required>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack(1)">Go Back</button>
+                <button onclick="nextStep(3)">Boost Now</button>
+            </div>
+        </div>
+
+        <!-- Step 3: Enter Quantity -->
+        <div class="step" id="step3">
+            <p>Enter Quantity</p>
+            <input type="number" id="quantityInput" min="1" placeholder="Enter quantity" required>
+            <p>Total Amount: <span id="totalAmount">Rs. 0.00</span></p>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack(2)">Go Back</button>
+                <button onclick="nextStep(4)">Pay to Boost</button>
+            </div>
+        </div>
+
+        <!-- Step 4: Payment Details -->
+        <div class="step" id="step4">
+            <p>Pay <span id="paymentAmount">Rs. 0.00</span> to boost</p>
+            <div class="payment-info">
+                <p><strong>Pay via eSewa:</strong> 9804563632</p>
+                <img src="Qr.jpg" alt="eSewa QR Code">
+                <p><small>Scan the QR code to make a payment</small></p>
+            </div>
+            <input type="text" id="transactionCode" placeholder="Enter transaction code" required>
+            <input type="number" id="paidAmount" placeholder="Enter paid amount" step="0.01" required>
+            <input type="text" id="remark" placeholder="Enter remark" required>
+            <div class="button-group">
+                <button class="back-btn" onclick="goBack(3)">Go Back</button>
+                <button id="submitBtn" onclick="submitForm()">Boost Now</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         let selectedService = '';
@@ -396,8 +595,8 @@
                     return;
                 }
                 total = costPerUnit * quantity;
-                document.getElementById('totalAmount').textContent = `Rs. ${total}`;
-                document.getElementById('paymentAmount').textContent = `Rs. ${total}`;
+                document.getElementById('totalAmount').textContent = `Rs. ${total.toFixed(2)}`;
+                document.getElementById('paymentAmount').textContent = `Rs. ${total.toFixed(2)}`;
                 transitionStep('step3', 'step4');
             }
         }
@@ -429,7 +628,7 @@
         document.getElementById('quantityInput').addEventListener('input', () => {
             quantity = parseInt(document.getElementById('quantityInput').value) || 0;
             total = costPerUnit * quantity;
-            document.getElementById('totalAmount').textContent = `Rs. ${total}`;
+            document.getElementById('totalAmount').textContent = `Rs. ${total.toFixed(2)}`;
         });
 
         // Submit form to Google Sheets and reset
@@ -441,8 +640,8 @@
             const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
             const remark = document.getElementById('remark').value;
 
-            if (!transactionCode || paidAmount !== total || !remark) {
-                alert('Please ensure all fields are filled correctly and paid amount matches the total!');
+            if (!transactionCode || paidAmount < total || !remark) {
+                alert('Please ensure all fields are filled correctly and the paid amount is equal to or greater than the total!');
                 return;
             }
 
@@ -455,8 +654,9 @@
                 service: selectedService,
                 link: link,
                 quantity: quantity,
-                total_amount: total,
+                total_amount: total.toFixed(2),
                 transaction_code: transactionCode,
+                paid_amount: paidAmount.toFixed(2),
                 remark: remark
             };
 
@@ -467,7 +667,7 @@
                 headers: { 'Content-Type': 'application/json' }
             })
             .then(() => {
-                const csvContent = `Timestamp,Service,Link,Quantity,Total Amount,Transaction Code,Remark\n${timestamp},${selectedService},${link},${quantity},${total},${transactionCode},${remark}`;
+                const csvContent = `Timestamp,Service,Link,Quantity,Total Amount,Paid Amount,Transaction Code,Remark\n${timestamp},${selectedService},${link},${quantity},${total.toFixed(2)},${paidAmount.toFixed(2)},${transactionCode},${remark}`;
                 const blob = new Blob([csvContent], { type: 'text/csv' });
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -500,8 +700,8 @@
 
             document.getElementById('linkInput').value = '';
             document.getElementById('quantityInput').value = '';
-            document.getElementById('totalAmount').textContent = 'Rs. 0';
-            document.getElementById('paymentAmount').textContent = 'Rs. 0';
+            document.getElementById('totalAmount').textContent = 'Rs. 0.00';
+            document.getElementById('paymentAmount').textContent = 'Rs. 0.00';
             document.getElementById('transactionCode').value = '';
             document.getElementById('paidAmount').value = '';
             document.getElementById('remark').value = '';
