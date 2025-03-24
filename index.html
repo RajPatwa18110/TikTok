@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <title>TikTok Booster</title>
     <style>
+        /* Same styles as before */
         * {
             margin: 0;
             padding: 0;
@@ -27,7 +28,6 @@
             position: relative;
         }
 
-        /* Thunder Lightning Effect */
         body::before {
             content: '';
             position: fixed;
@@ -151,6 +151,10 @@
             transition: all 0.3s ease;
         }
 
+        input[type="file"] {
+            padding: 8px;
+        }
+
         input:hover, button:hover {
             box-shadow: 0 0 15px #8a00ff;
             transform: scale(1.03);
@@ -250,6 +254,7 @@
             <input type="text" id="transactionCode" placeholder="Enter transaction code" required>
             <input type="number" id="paidAmount" placeholder="Enter paid amount" required>
             <input type="text" id="remark" placeholder="Enter remark" required>
+            <input type="file" id="screenshotInput" accept="image/*" required>
             <div class="button-group">
                 <button class="back-btn" onclick="goBack(3)">Go Back</button>
                 <button id="submitBtn" onclick="submitForm()">Boost Now</button>
@@ -265,9 +270,8 @@
         let total = 0;
         let isSubmitting = false;
 
-        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbxPsF6ghhjBA1cNs5snKZ3DuCTN3jcJmiDOBIVuRcu8L4RH7cuZK9a4KWOMMeFmwbG6/exec';
+        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbyVvMTCArt6veK8HAAZVX4JMTsVl2Xp6xq7S-e-zcaTv3nHSKGZbIA5rTfjyF45abyC/exec';
 
-        // Show welcome popup and start at Step 1
         window.onload = () => {
             setTimeout(() => {
                 document.getElementById('welcomePopup').style.animation = 'fadeOut 0.3s ease-out forwards';
@@ -279,7 +283,6 @@
             }, 750);
         };
 
-        // Select boost option
         function selectOption(service, cost) {
             selectedService = service;
             costPerUnit = cost;
@@ -288,7 +291,6 @@
                 service === 'followers' ? 'Enter your TikTok account link' : 'Enter your TikTok video link';
         }
 
-        // Move to next step
         function nextStep(step) {
             if (step === 3) {
                 link = document.getElementById('linkInput').value;
@@ -310,7 +312,6 @@
             }
         }
 
-        // Go back to previous step
         function goBack(previousStep) {
             if (previousStep === 1) {
                 transitionStep('step2', 'step1');
@@ -321,7 +322,6 @@
             }
         }
 
-        // Smooth transition between steps
         function transitionStep(currentStepId, nextStepId) {
             const currentStep = document.getElementById(currentStepId);
             currentStep.style.animation = 'fadeOut 0.3s ease-out forwards';
@@ -333,72 +333,82 @@
             }, 300);
         }
 
-        // Calculate total on quantity input
         document.getElementById('quantityInput').addEventListener('input', () => {
             quantity = parseInt(document.getElementById('quantityInput').value) || 0;
             total = costPerUnit * quantity;
             document.getElementById('totalAmount').textContent = `Rs. ${total}`;
         });
 
-        // Submit form to Google Sheets and reset
-        function submitForm() {
+        async function submitForm() {
             if (isSubmitting) return;
 
             const submitBtn = document.getElementById('submitBtn');
             const transactionCode = document.getElementById('transactionCode').value;
             const paidAmount = parseFloat(document.getElementById('paidAmount').value) || 0;
             const remark = document.getElementById('remark').value;
+            const screenshotInput = document.getElementById('screenshotInput');
+            const screenshotFile = screenshotInput.files[0];
 
-            if (!transactionCode || paidAmount !== total || !remark) {
-                alert('Please ensure all fields are filled correctly and paid amount matches the total!');
+            if (!transactionCode || paidAmount !== total || !remark || !screenshotFile) {
+                alert('Please ensure all fields are filled correctly, paid amount matches the total, and a screenshot is uploaded!');
                 return;
             }
 
             isSubmitting = true;
             submitBtn.disabled = true;
 
-            const timestamp = new Date().toLocaleString();
-            const formData = {
-                timestamp: timestamp,
-                service: selectedService,
-                link: link,
-                quantity: quantity,
-                total_amount: total,
-                transaction_code: transactionCode,
-                remark: remark
+            const reader = new FileReader();
+            reader.readAsDataURL(screenshotFile);
+            reader.onload = async () => {
+                const screenshotBase64 = reader.result.split(',')[1];
+
+                const timestamp = new Date().toLocaleString();
+                const formData = {
+                    timestamp: timestamp,
+                    service: selectedService,
+                    link: link,
+                    quantity: quantity,
+                    total_amount: total,
+                    transaction_code: transactionCode,
+                    remark: remark,
+                    screenshot: screenshotBase64,
+                    filename: screenshotFile.name
+                };
+
+                try {
+                    await fetch(GOOGLE_SHEET_URL, {
+                        method: 'POST',
+                        mode: 'no-cors', // Use no-cors to bypass CORS for POST
+                        body: JSON.stringify(formData),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    const csvContent = `Timestamp,Service,Link,Quantity,Total Amount,Transaction Code,Remark,Screenshot\n${timestamp},${selectedService},${link},${quantity},${total},${transactionCode},${remark},${screenshotFile.name}`;
+                    const blob = new Blob([csvContent], { type: 'text/csv' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `tiktok_boost_${Date.now()}.csv`;
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+
+                    alert('Boost submitted successfully! Data stored in Google Sheet.');
+                    resetForm();
+                } catch (error) {
+                    console.error('Submission Error:', error);
+                    alert('Error submitting to Google Sheet. Check the console for details.');
+                } finally {
+                    isSubmitting = false;
+                    submitBtn.disabled = false;
+                }
             };
-
-            fetch(GOOGLE_SHEET_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(formData),
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(() => {
-                const csvContent = `Timestamp,Service,Link,Quantity,Total Amount,Transaction Code,Remark\n${timestamp},${selectedService},${link},${quantity},${total},${transactionCode},${remark}`;
-                const blob = new Blob([csvContent], { type: 'text/csv' });
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `tiktok_boost_${Date.now()}.csv`;
-                a.click();
-                window.URL.revokeObjectURL(url);
-
-                alert('Boost submitted successfully! Data stored in Google Sheet.');
-
-                resetForm();
+            reader.onerror = () => {
+                alert('Error reading the screenshot file!');
                 isSubmitting = false;
                 submitBtn.disabled = false;
-            })
-            .catch(error => {
-                console.error('Submission Error:', error);
-                alert('Error submitting to Google Sheet: ' + error.message + '. Check the console for details.');
-                isSubmitting = false;
-                submitBtn.disabled = false;
-            });
+            };
         }
 
-        // Reset form and restart at Step 1
         function resetForm() {
             selectedService = '';
             costPerUnit = 0;
@@ -413,9 +423,10 @@
             document.getElementById('transactionCode').value = '';
             document.getElementById('paidAmount').value = '';
             document.getElementById('remark').value = '';
+            document.getElementById('screenshotInput').value = '';
 
             transitionStep('step4', 'step1');
         }
     </script>
 </body>
-                </html>
+</html>
