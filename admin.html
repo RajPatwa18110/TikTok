@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <title>TikTok Booster Dashboard</title>
+    <style>
+        /* Same styles as before */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #1a0033, #330066);
+            color: #e0e0ff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            opacity: 0;
+            animation: lightning 8s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes lightning {
+            0%, 90% { opacity: 0; }
+            92% { opacity: 0.6; }
+            94% { opacity: 0.2; }
+            96% { opacity: 0.8; }
+            98% { opacity: 0.3; }
+            100% { opacity: 0; }
+        }
+
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 10px #8a00ff, 0 0 20px #8a00ff; }
+            50% { box-shadow: 0 0 20px #8a00ff, 0 0 30px #8a00ff; }
+            100% { box-shadow: 0 0 10px #8a00ff, 0 0 20px #8a00ff; }
+        }
+
+        .container {
+            background: linear-gradient(145deg, #2a004d, #1a0033);
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(138, 0, 255, 0.5);
+            padding: 30px;
+            max-width: 1200px;
+            width: 100%;
+            animation: glowPulse 3s infinite alternate;
+            position: relative;
+            z-index: 1;
+        }
+
+        h2 {
+            color: #cc99ff;
+            margin-bottom: 25px;
+            text-shadow: 0 0 10px #cc99ff;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #3d007a;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            color: #e0e0ff;
+            border-bottom: 1px solid rgba(138, 0, 255, 0.3);
+        }
+
+        th {
+            background: #8a00ff;
+            color: #fff;
+            text-shadow: 0 0 5px #000;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background: #4d0099;
+            transition: background 0.3s ease;
+        }
+
+        td a {
+            color: #cc99ff;
+            text-decoration: none;
+        }
+
+        td a:hover {
+            text-decoration: underline;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            border: none;
+            border-radius: 12px;
+            background: #8a00ff;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px auto 0;
+            display: block;
+        }
+
+        button:hover {
+            background: #a600ff;
+            box-shadow: 0 0 20px #a600ff;
+            transform: scale(1.05);
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #cc99ff;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>TikTok Booster Dashboard</h2>
+        <div class="table-container">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Timestamp</th>
+                        <th>Service</th>
+                        <th>Link</th>
+                        <th>Quantity</th>
+                        <th>Total Amount</th>
+                        <th>Transaction Code</th>
+                        <th>Remark</th>
+                        <th>Screenshot</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        <div id="loading" class="loading">Loading data...</div>
+        <button onclick="fetchData()">Refresh Data</button>
+    </div>
+
+    <script>
+        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbyVvMTCArt6veK8HAAZVX4JMTsVl2Xp6xq7S-e-zcaTv3nHSKGZbIA5rTfjyF45abyC/exec';
+
+        async function fetchData() {
+            const loadingDiv = document.getElementById('loading');
+            const tableBody = document.getElementById('tableBody');
+            
+            loadingDiv.style.display = 'block';
+            tableBody.innerHTML = '';
+
+            try {
+                const response = await fetch(`${GOOGLE_SHEET_URL}?action=get`, {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    data.forEach(row => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${row.timestamp || ''}</td>
+                            <td>${row.service || ''}</td>
+                            <td>${row.link || ''}</td>
+                            <td>${row.quantity || ''}</td>
+                            <td>Rs. ${row.total_amount || '0'}</td>
+                            <td>${row.transaction_code || ''}</td>
+                            <td>${row.remark || ''}</td>
+                            <td>${row.screenshot_url ? `<a href="${row.screenshot_url}" target="_blank">View Screenshot</a>` : 'No Screenshot'}</td>
+                        `;
+                        tableBody.appendChild(tr);
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="8">No data available</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                tableBody.innerHTML = '<tr><td colspan="8">Error loading data. Please ensure this page is hosted on a server.</td></tr>';
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        }
+
+        window.onload = fetchData;
+    </script>
+</body>
+</html>
